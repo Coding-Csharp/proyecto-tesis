@@ -15,6 +15,9 @@ namespace ProyectoTesis.Controllers
         public IActionResult ListEmployees() => View();
 
         [HttpGet]
+        public IActionResult AttendanceList() => View();
+
+        [HttpGet]
         public IActionResult LoadListEmployees()
         {
             List<Employee> employees = [];
@@ -27,6 +30,21 @@ namespace ProyectoTesis.Controllers
 
             return Content(JsonConvert.SerializeObject
                 (employees), "application/json");
+        }
+
+        [HttpGet]
+        public IActionResult ListAttendances()
+        {
+            List<Attendance> attendances = [];
+
+            attendances.Add(new(4551, "Aaron", "Alarcon", DateTime.Now, DateTime.Now.AddHours(4), 2));
+            attendances.Add(new(4551, "Aaron", "Alarcon", DateTime.Now, DateTime.Now.AddHours(4), 2));
+            attendances.Add(new(4551, "Aaron", "Alarcon", DateTime.Now, DateTime.Now.AddHours(4), 2));
+            attendances.Add(new(4551, "Aaron", "Alarcon", DateTime.Now, DateTime.Now.AddHours(4), 2));
+            attendances.Add(new(4551, "Aaron", "Alarcon", DateTime.Now, DateTime.Now.AddHours(4), 2));
+
+            return Content(JsonConvert.SerializeObject
+                (attendances),"application/json");
         }
 
         [HttpGet]
