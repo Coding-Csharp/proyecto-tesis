@@ -30,7 +30,7 @@ namespace ProyectoTesis.Controllers
         }
 
         [HttpGet]
-        public IActionResult LoadListAttendaces(int id)
+        public IActionResult LoadListAttendances(int id)
         {
             List<Attendance> attendances = [];
 
