@@ -1,0 +1,214 @@
+﻿@{
+    ViewData["Title"] = "ListEmployees";
+    Layout = "~/Views/Shared/AdminLayout.cshtml";
+}
+
+@section Styles {
+
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.2/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="~/admins/css/login.css">
+}
+
+<div class="container">
+
+    <br />
+
+    <div class="row header" style="text-align:center;color:green">
+        <h3>Lista de trabajadores</h3>
+    </div>
+
+    <table id="tblEmployees" class="table table-striped table-bordered" style="width:auto;"></table>
+</div>
+
+<div id="mdlEmployeeDetail" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered justify-content-center" role="document">
+        <div class="modal-content border-0 mx-3">
+            <div class="modal-body p-0">
+                <div class="card text-center">
+
+                    <div class="card-header pb-0 bg-white border-0">
+                        <div class="row">
+                            <div class="col ml-auto">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <h3>Control de asistencia</h3>
+
+                    </div>
+
+                    <div class="card-body px-sm-5 mb-5">
+
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Id</th>
+                                        <th scope="col">Nombres</th>
+                                        <th scope="col">Apellidos</th>
+                                        <th scope="col">Entrada</th>
+                                        <th scope="col">Salida</th>
+                                        <th scope="col">Min Tardanza</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbdEmployeeDetail"></tbody>
+                            </table>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.2/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript">
+
+        $(document).ready(function() {
+
+            var employees = [];
+
+            $(window).on('load', async function () {
+
+                try {
+
+                    await loadListEmployees();
+
+                } catch (error) {
+
+                    console.error('Error durante la carga de datos: ', error);
+                }
+            });
+
+            $('#tblEmployees').on('click', '#btnEmployeeDetail', function () {
+
+                var table = $('#tblEmployees').DataTable();
+
+                var rowData = table.row($(this).closest('tr')).data();
+
+                jQuery.ajax({
+
+                    url: '@Url.Action("LoadListAttendaces", "Admins")' + `?id=${rowData.Id}`,
+                    method: 'GET',
+                    dataType: 'json',
+                    contentType: 'application/json; charset=utf-8',
+                    success: function(data) {
+
+                        var contentHtml = ``;
+
+                        for (const item of data) {
+
+                            var checkIn = new Date(item.CheckIn);
+                            var checkOut = new Date(item.CheckOut);
+
+                            contentHtml +=
+                                `<tr>
+                                    <th scope="col">${item.Id}</th>
+                                    <th scope="col">${item.FirstName}</th>
+                                    <th scope="col">${item.LastName}</th>
+                                    <th scope="col">${getFormattedDate(checkIn)}</th>
+                                    <th scope="col">${getFormattedDate(checkOut)}</th>
+                                    <th scope="col">${item.MinuteLate}</th>
+                                 </tr>`;
+                        }
+
+                        $('#tbdEmployeeDetail').html(contentHtml);
+                    },
+                    error: function(error) {
+
+                        window.open('@Url.Action("Error", "Home")', '_self');
+                    }
+                });
+            });
+
+            async function loadListEmployees() {
+
+                try {
+
+                    var data = await jQuery.ajax({
+
+                        url: '@Url.Action("LoadListEmployees", "Admins")',
+                        method: 'GET',
+                        dataType: 'json',
+                        contentType: 'application/json; charset=utf-8'
+                    });
+
+                    employees = data;
+
+                    fillTableEmployees(employees);
+
+                } catch (error) {
+
+                    window.open('@Url.Action("Error", "Home")', '_self');
+                }
+            }
+
+            function fillTableEmployees(listEmployees) {
+
+                if (listEmployees.length === 0) {
+
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'No se encontraron resultados!',
+                        text: 'No existen datos al intentar buscar por estado de atencion!'
+                    });
+
+                    return;
+                }
+
+                var columns = [];
+
+                columns = [
+                    { data: 'Id', title: 'Id' },
+                    { data: 'FirstName', title: 'Nombre' },
+                    { data: 'LastName', title: 'Apellido' },
+                    { data: 'JobDepartment', title: 'Departamento' },
+                    { data: 'JobPosition', title: 'Cargo' }
+                ];
+
+                columns.push({
+
+                    data: null,
+                    title: "Opciones",
+                    render: function (data, type, row) {
+
+                        return `
+                            <button id="btnEmployeeDetail" class="btn btn-sm btn-neutral" data-toggle="modal" data-target="#mdlEmployeeDetail">Detalle</button>`;
+                    }
+                });
+
+                if ($.fn.DataTable.isDataTable('#tblEmployees')) {
+
+                    $('#tblEmployees').DataTable().clear().destroy();
+                }
+
+                $('#tblEmployees').DataTable({
+                    data: listEmployees,
+                    columns: columns,
+                    searching: true,
+                    paging: true,
+                    ordering: true
+                });
+            }
+
+            function getFormattedDate(date) {
+
+                let day = String(date.getDate()).padStart(2, '0');
+                let mounth = String(date.getMonth() + 1).padStart(2, '0');
+                let year = date.getFullYear();
+                let hour = String(date.getHours()).padStart(2, '0');
+                let minutes = String(date.getMinutes()).padStart(2, '0');
+                let seconds = String(date.getSeconds()).padStart(2, '0');
+
+                return `${day}/${mounth}/${year} ${hour}:${minutes}:${seconds}`;
+            }
+        });
+
+    </script>
+}
