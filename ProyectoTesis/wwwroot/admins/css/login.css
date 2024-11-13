@@ -1,0 +1,10 @@
+.table-responsive {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+}
