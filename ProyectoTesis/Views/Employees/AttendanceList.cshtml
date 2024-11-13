@@ -3,4 +3,222 @@
     Layout = "~/Views/Shared/EmployeeLayout.cshtml";
 }
 
-<h1>AttendanceList</h1>
+@section Styles {
+
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.2/css/jquery.dataTables.min.css">
+}
+
+<div class="container">
+
+    <br />
+
+    <div class="row header" style="text-align:center;color:green">
+        <h3>Control de asistencias</h3>
+    </div>
+
+    <a class="btn btn-warning" data-toggle="modal" data-target="#mdlRegisterCheckIn">Marcar asistencia</a>
+
+    <hr />
+
+    <table id="tblAttendances" class="table table-striped table-bordered" style="width:auto;"></table>
+</div>
+
+<div id="mdlRegisterCheckIn" class="modal fade" tabindex="-1" aria-labelledby="mdlRegisterCheckIn" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header float-right">
+
+                <h5>Registrar entrada</h5>
+
+                <div class="text-right">
+                    <i data-dismiss="modal" aria-label="Close" class="fa fa-close"></i>
+                </div>
+
+            </div>
+
+            <div class="modal-body">
+                <div>
+                    <div class="box">
+
+                        <label>Hora de entrada:</label>
+                        <input id="iptCheckOut" class="form-control" readonly>
+
+                        <label>Hora de salida:</label>
+                        <input id="iptCheckIn" value="--" class="form-control" readonly>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button id="btnRegisterAttendance" type="button" class="btn btn-primary">Registrar</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="mdlRegisterCheckOut" class="modal fade" tabindex="-1" aria-labelledby="mdlRegisterCheckOut" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header float-right">
+
+                <h5>Registrar salida</h5>
+
+                <div class="text-right">
+                    <i data-dismiss="modal" aria-label="Close" class="fa fa-close"></i>
+                </div>
+
+            </div>
+
+            <div class="modal-body">
+                <div>
+                    <div class="box">
+
+                        <label>Hora de entrada:</label>
+                        <input id="iptCheckOut" class="form-control" readonly>
+
+                        <label>Hora de salida:</label>
+                        <input id="iptCheckIn" class="form-control" readonly>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button id="btnRegisterCheckOut" type="button" class="btn btn-primary">Registrar</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.2/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript">
+
+        $(document).ready(function() {
+
+            var attendances = [];
+
+            $(window).on('load', async function () {
+
+                try {
+
+                    const ahora = new Date();
+
+                    const dia = ahora.getDate();
+                    const mes = ahora.getMonth() + 1;
+                    const año = ahora.getFullYear();
+                    const hora = ahora.getHours();
+                    const minutos = ahora.getMinutes();
+                    const segundos = ahora.getSeconds();
+
+                    const fechaHoraFormateada = `${dia}/${mes}/${año} ${hora}:${minutos}:${segundos}`;
+
+                    $('#iptCheckOut').val(fechaHoraFormateada);
+
+                    await loadListAttendances();
+
+                } catch (error) {
+
+                    console.error('Error durante la carga de datos: ', error);
+                }
+            });
+
+            $('#tblAttendances').on('click', '#btnCheckOut', function () {
+
+                var table = $('#tblAttendances').DataTable();
+
+                var rowData = table.row($(this).closest('tr')).data();
+            });
+
+            async function loadListAttendances() {
+
+                try {
+
+                    var data = await jQuery.ajax({
+
+                        url: '@Url.Action("LoadListAttendances", "Employees")',
+                        method: 'GET',
+                        dataType: 'json',
+                        contentType: 'application/json; charset=utf-8'
+                    });
+
+                    attendances = data;
+
+                    fillTableAttendances(attendances);
+
+                } catch (error) {
+
+                    //window.open('@Url.Action("Error", "Home")', '_self');
+                }
+            }
+
+            function fillTableAttendances(listAttendances) {
+
+                if (listAttendances.length === 0) {
+
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'No se encontraron resultados!',
+                        text: 'No existen datos.'
+                    });
+
+                    return;
+                }
+
+                var columns = [];
+
+                columns = [
+                    { data: 'Id', title: 'Id' },
+                    { data: 'FirstName', title: 'Nombre' },
+                    { data: 'LastName', title: 'Apellido' },
+                    { data: 'CheckIn', title: 'Ingreso' },
+                    { data: 'CheckOut', title: 'Salida' },
+                    { data: 'MinuteLate', title: 'Min tarde' }
+                ];
+
+                // columns.push({
+
+                //     data: null,
+                //     title: "Opciones",
+                //     render: function (data, type, row) {
+
+                //         return `
+                //             <button id="btnCheckOut" class="btn btn-sm btn-neutral" data-toggle="modal" data-target="#mdlRegisterCheckOut">Marcar salida</button>`;
+                //     }
+                // });
+
+                if ($.fn.DataTable.isDataTable('#tblAttendances')) {
+
+                    $('#tblAttendances').DataTable().clear().destroy();
+                }
+
+                $('#tblAttendances').DataTable({
+                    data: listAttendances,
+                    columns: columns,
+                    searching: true,
+                    paging: true,
+                    ordering: true
+                });
+            }
+
+            function getFormattedDate(date) {
+
+                let day = String(date.getDate()).padStart(2, '0');
+                let mounth = String(date.getMonth() + 1).padStart(2, '0');
+                let year = date.getFullYear();
+                let hour = String(date.getHours()).padStart(2, '0');
+                let minutes = String(date.getMinutes()).padStart(2, '0');
+                let seconds = String(date.getSeconds()).padStart(2, '0');
+
+                return `${day}/${mounth}/${year} ${hour}:${minutes}:${seconds}`;
+            }
+        });
+
+    </script>
+}

@@ -6,7 +6,6 @@
 @section Styles {
 
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.2/css/jquery.dataTables.min.css">
-    <link rel="stylesheet" href="~/admins/css/login.css">
 }
 
 <div class="container">
@@ -94,7 +93,7 @@
 
                 jQuery.ajax({
 
-                    url: '@Url.Action("LoadListAttendaces", "Admins")' + `?id=${rowData.Id}`,
+                    url: '@Url.Action("LoadListAttendances", "Admins")' + `?id=${rowData.Id}`,
                     method: 'GET',
                     dataType: 'json',
                     contentType: 'application/json; charset=utf-8',
@@ -156,7 +155,7 @@
                     Swal.fire({
                         icon: 'info',
                         title: 'No se encontraron resultados!',
-                        text: 'No existen datos al intentar buscar por estado de atencion!'
+                        text: 'No existen datos.'
                     });
 
                     return;
