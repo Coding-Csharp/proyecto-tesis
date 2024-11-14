@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using ProyectoTesis.Models;
+using ProyectoTesis.Models.Test;
 
 namespace ProyectoTesis.Controllers
 {

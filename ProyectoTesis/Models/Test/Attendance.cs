@@ -1,4 +1,4 @@
-﻿namespace ProyectoTesis.Models
+﻿namespace ProyectoTesis.Models.Test
 {
     public class Attendance
     {
@@ -11,22 +11,22 @@
 
         public Attendance()
         {
-            this.Id = 0;
-            this.FirstName = string.Empty;
-            this.LastName = string.Empty;
-            this.MinuteLate = 0;
+            Id = 0;
+            FirstName = string.Empty;
+            LastName = string.Empty;
+            MinuteLate = 0;
         }
         public Attendance
             (int id, string firstName, string lastName,
             DateTime checkIn, DateTime checkOut,
             int minuteLate)
         {
-            this.Id = id;
-            this.FirstName = firstName;
-            this.LastName = lastName;
-            this.CheckIn = checkIn;
-            this.CheckOut = checkOut;
-            this.MinuteLate = minuteLate;
+            Id = id;
+            FirstName = firstName;
+            LastName = lastName;
+            CheckIn = checkIn;
+            CheckOut = checkOut;
+            MinuteLate = minuteLate;
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace ProyectoTesis.Models
 {
-    public class Employee
+    public class Admin
     {
         public string Id { get; set; } = null!;
         public int SpecialtiesId { get; set; }
@@ -16,7 +16,7 @@
         public string Address { get; set; } = null!;
         public string ZoneAccess { get; set; } = null!;
 
-        public virtual EmployeesCredential? EmployeeCredential { get; }
+        public virtual AdminCredential? AdminCredential { get; }
         public virtual Specialty Specialty { get; } = null!;
 
         public virtual ICollection<Assign> Assigns { get; } = [];
