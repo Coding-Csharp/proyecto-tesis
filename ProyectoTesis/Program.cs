@@ -1,4 +1,8 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using System.Data;
+using ProyectoTesis.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +19,20 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
         options.SlidingExpiration = true;
     });
+
+#endregion
+
+#region DataBase Configuration
+
+builder.Services.AddTransient<IDbConnection>(db =>
+
+    new SqlConnection(builder.Configuration
+    .GetConnectionString("Tesis"))
+);
+builder.Services.AddDbContext<TesisContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("Tesis"));
+});
 
 #endregion
 

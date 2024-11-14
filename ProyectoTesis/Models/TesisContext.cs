@@ -2,14 +2,13 @@
 
 namespace ProyectoTesis.Models
 {
-    public class TesisContext : DbContext
+    public partial class TesisContext : DbContext
     {
         public TesisContext() { }
 
         public TesisContext
-            (DbContextOptions<TesisContext> options) :
-            base(options)
-        { }
+            (DbContextOptions<TesisContext> options)
+            : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
