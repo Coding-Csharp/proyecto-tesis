@@ -58,6 +58,15 @@ namespace ProyectoTesis.Controllers
         public IActionResult Maintenance() => View();
 
         [HttpGet]
+        public async Task<IActionResult> LoadSpecialties()
+        {
+            var result = await context.Set<Specialty>().ToListAsync();
+
+            return Content(JsonConvert.SerializeObject
+                (result), "application/json");
+        }
+
+        [HttpGet]
         public async Task<IActionResult> LoadListEmployees()
         {
             var result = await
@@ -73,8 +82,17 @@ namespace ProyectoTesis.Controllers
                  select new
                  {
                      em.Id,
+                     em.DateEntry,
+                     em.TypeDocument,
                      em.Firstname,
                      em.Lastname,
+                     em.Birthdate,
+                     em.Nationality,
+                     em.Genre,
+                     em.Phone,
+                     em.Email,
+                     em.Address,
+                     em.ZoneAccess,
                      Area = ar.Name,
                      Position = po.Name,
                      Specialty = es.Name,
@@ -110,6 +128,79 @@ namespace ProyectoTesis.Controllers
                 ).ToListAsync();
 
             return Content(JsonConvert.SerializeObject(result), "application/json");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RegisterEmployee
+            (Employee employee)
+        {
+            await context.Set<Employee>().AddAsync(employee);
+
+            await context.SaveChangesAsync();
+
+            return Content(JsonConvert.SerializeObject
+                (true), "application/json");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateEmployee
+            (Employee employee)
+        {
+            context.Set<Employee>().Update(employee);
+
+            await context.SaveChangesAsync();
+
+            return Content(JsonConvert.SerializeObject
+                (true), "application/json");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> DeleteEmployee
+            (string id)
+        {
+            var employee = await context.Set<Employee>().Where(e => e.Id == id).FirstOrDefaultAsync();
+
+            context.Set<Employee>().Remove(employee);
+
+            await context.SaveChangesAsync();
+
+            return Content(JsonConvert.SerializeObject
+                (true), "application/json");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> MarkAttendance
+            (string markType)
+        {
+            var result = false;
+
+            if (markType == "ENTRADA")
+            {
+                var s = GetPersonId();
+
+                await context.Set<Assist>().AddAsync
+                    (new(null, GetPersonId(), DateTime.Now, null, 0, string.Empty));
+
+                await context.SaveChangesAsync();
+
+                result = true;
+            }
+            else if (markType == "SALIDA")
+            {
+                var assist = await context.Set<Assist>()
+                    .Where(a => a.EmployeesId == GetPersonId() &&
+                    a.CheckOut == null).FirstOrDefaultAsync();
+
+                if (assist != null)
+                {
+                    result = await context.Set<Assist>().Where(a => a.Id == assist.Id)
+                    .ExecuteUpdateAsync(a => a
+                    .SetProperty(u => u.CheckOut, DateTime.Now)) > 0;
+                }
+            }
+
+            return Content(JsonConvert.SerializeObject
+                (result), "application/json");
         }
 
         private string GetPersonId()
