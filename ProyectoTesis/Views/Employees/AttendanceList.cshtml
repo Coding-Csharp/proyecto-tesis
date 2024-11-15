@@ -16,80 +16,35 @@
         <h3>Control de asistencias</h3>
     </div>
 
-    <a id="btnCheckIn" class="btn btn-primary" data-toggle="modal" data-target="#mdlRegisterCheckIn">Marcar entrada</a>
-    <a id="btnCheckOut" class="btn btn-warning" data-toggle="modal" data-target="#mdlRegisterCheckOut">Marcar salida</a>
+    <a id="btnAttendance" class="btn btn-primary" data-toggle="modal" data-target="#mdlRegisterAttendance">Marcar asistencia</a>
 
     <hr />
 
     <table id="tblAttendances" class="table table-striped table-bordered" style="width:auto;"></table>
 </div>
 
-<div id="mdlRegisterCheckIn" class="modal fade" tabindex="-1" aria-labelledby="mdlRegisterCheckIn" aria-hidden="true">
+<div id="mdlRegisterAttendance" class="modal fade" tabindex="-1" aria-labelledby="mdlRegisterAttendance" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-
-            <div class="modal-header float-right">
-
-                <h5>Registrar salida</h5>
-
-                <div class="text-right">
-                    <i data-dismiss="modal" aria-label="Close" class="fa fa-close"></i>
-                </div>
-
+            <div class="modal-header">
+                <h5 id="modalTitle"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
-
             <div class="modal-body">
-                <div>
-                    <div class="box">
+                <label>Fecha:</label>
+                <input id="iptDate" class="form-control" readonly>
 
-                        <label>Hora de entrada:</label>
-                        <input id="iptCheckIn" class="form-control" readonly>
+                <label>Hora de entrada:</label>
+                <input id="iptCheckIn" class="form-control" readonly>
 
-                        <label>Hora de salida:</label>
-                        <input id="iptCheckOut" value="---" class="form-control" readonly>
-
-                    </div>
-                </div>
+                <label>Hora de salida:</label>
+                <input id="iptCheckOut" class="form-control" readonly>
             </div>
-
             <div class="modal-footer">
-                <button id="btnRegisterCheckIn" type="button" class="btn btn-primary">Registrar</button>
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
-<div id="mdlRegisterCheckOut" class="modal fade" tabindex="-1" aria-labelledby="mdlRegisterCheckOut" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-
-            <div class="modal-header float-right">
-
-                <h5>Registrar salida</h5>
-
-                <div class="text-right">
-                    <i data-dismiss="modal" aria-label="Close" class="fa fa-close"></i>
-                </div>
-
-            </div>
-
-            <div class="modal-body">
-                <div>
-                    <div class="box">
-
-                        <label>Hora de entrada:</label>
-                        <input id="ipttCheckIn" value="---" class="form-control" readonly>
-
-                        <label>Hora de salida:</label>
-                        <input id="ipttCheckOut" class="form-control" readonly>
-
-                    </div>
-                </div>
-            </div>
-
-            <div class="modal-footer">
-                <button id="btnRegisterCheckOut" type="button" class="btn btn-primary">Registrar</button>
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button id="btnRegisterAttendance" type="button" class="btn btn-primary">Registrar</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
             </div>
         </div>
     </div>
@@ -102,6 +57,7 @@
 
         $(document).ready(function() {
 
+            var isCheckIn = true;
             var attendances = [];
 
             $(window).on('load', async function () {
@@ -116,26 +72,36 @@
                 }
             });
 
-            $("#btnCheckIn").on("click", function() {
+            $("#btnAttendance").on("click", function() {
 
-                $("#iptCheckIn").val(getDateTime());
+                if (isCheckIn) {
+                    $("#modalTitle").text("Registrar entrada");
+                    $("#iptDate").val(getDate());
+                    $("#iptCheckIn").val(getTime());
+                    $("#iptCheckOut").val("---");
+                } else {
+
+                    $("#modalTitle").text("Registrar salida");
+                    $("#iptDate").val(getDate());
+                    $("#iptCheckIn").val("---");
+                    $("#iptCheckOut").val(getTime());
+                }
             });
 
-            $("#btnRegisterCheckIn").on("click", async function() {
+            $("#btnRegisterAttendance").on("click", async function() {
 
-                await markAttendance("ENTRADA");
-                await loadListAttendances();
-            });
+                if (isCheckIn) {
 
-            $("#btnCheckOut").on("click", function() {
+                    await markAttendance("ENTRADA");
+                    await loadListAttendances();
+                } else {
 
-                $("#ipttCheckOut").val(getDateTime());
-            });
+                    await markAttendance("SALIDA");
+                    await loadListAttendances();
+                }
 
-            $("#btnRegisterCheckOut").on("click", async function() {
-
-                await markAttendance("SALIDA");
-                await loadListAttendances();
+                isCheckIn = !isCheckIn;
+                $("#mdlRegisterAttendance").modal('hide');
             });
 
             async function loadListAttendances() {
@@ -213,6 +179,7 @@
                     { data: 'Id', title: 'Id' },
                     { data: 'Firstname', title: 'Nombre' },
                     { data: 'Lastname', title: 'Apellido' },
+                    { data: 'Date', title: 'Fecha' },
                     { data: 'CheckIn', title: 'Ingreso' },
                     { data: 'CheckOut', title: 'Salida' },
                     { data: 'MinuteLate', title: 'Min tarde' }
@@ -221,6 +188,25 @@
                 if ($.fn.DataTable.isDataTable('#tblAttendances')) {
 
                     $('#tblAttendances').DataTable().clear().destroy();
+                }
+
+                for (var i = 0; i < listAttendances.length; ++i) {
+
+                    var date = new Date(listAttendances[i].Date);
+                    listAttendances[i].Date = getFormattedDate(date);
+
+                    var checkInDate = new Date(listAttendances[i].CheckIn);
+                    listAttendances[i].CheckIn = getFormattedTime(checkInDate);
+
+                    if (listAttendances[i].CheckOut !== null){
+
+                        var checkOutDate = new Date(listAttendances[i].CheckOut);
+                        listAttendances[i].CheckOut = getFormattedTime(checkOutDate);
+                    }
+                    else {
+
+                        listAttendances[i].CheckOut = null;
+                    }
                 }
 
                 $('#tblAttendances').DataTable({
@@ -245,6 +231,27 @@
                 return `${day}/${mounth}/${year} ${hour}:${minutes}`;
             }
 
+            function getDate() {
+
+                const date = new Date();
+
+                const day = date.getDate();
+                const mounth = date.getMonth() + 1;
+                const year = date.getFullYear();
+
+                return `${day}/${mounth}/${year}`;
+            }
+
+            function getTime() {
+
+                const date = new Date();
+
+                const hour = date.getHours();
+                const minutes = date.getMinutes();
+
+                return `${hour}:${minutes}`;
+            }
+
             function getFormattedDate(date) {
 
                 let day = String(date.getDate()).padStart(2, '0');
@@ -253,7 +260,18 @@
                 let hour = String(date.getHours()).padStart(2, '0');
                 let minutes = String(date.getMinutes()).padStart(2, '0');
 
-                return `${day}/${mounth}/${year} ${hour}:${minutes}`;
+                return `${day}/${mounth}/${year}`;
+            }
+
+            function getFormattedTime(date) {
+
+                let day = String(date.getDate()).padStart(2, '0');
+                let mounth = String(date.getMonth() + 1).padStart(2, '0');
+                let year = date.getFullYear();
+                let hour = String(date.getHours()).padStart(2, '0');
+                let minutes = String(date.getMinutes()).padStart(2, '0');
+
+                return `${hour}:${minutes}`;
             }
         });
 
