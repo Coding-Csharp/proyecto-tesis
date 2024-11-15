@@ -49,6 +49,10 @@ namespace ProyectoTesis.Models
                     .HasMaxLength(50)
                     .IsUnicode(false)
                     .HasColumnName("nationality");
+                entity.Property(e => e.State)
+                    .HasMaxLength(50)
+                    .IsUnicode(false)
+                    .HasColumnName("state");
                 entity.Property(e => e.Phone).HasColumnName("phone");
                 entity.Property(e => e.SpecialtiesId).HasColumnName("specialties_id");
                 entity.Property(e => e.TypeDocument)
@@ -205,6 +209,10 @@ namespace ProyectoTesis.Models
                     .HasMaxLength(50)
                     .IsUnicode(false)
                     .HasColumnName("nationality");
+                entity.Property(e => e.State)
+                    .HasMaxLength(50)
+                    .IsUnicode(false)
+                    .HasColumnName("state");
                 entity.Property(e => e.Phone).HasColumnName("phone");
                 entity.Property(e => e.SpecialtiesId).HasColumnName("specialties_id");
                 entity.Property(e => e.TypeDocument)

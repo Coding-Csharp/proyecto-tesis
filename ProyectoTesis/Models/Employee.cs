@@ -15,6 +15,7 @@
         public string Email { get; set; } = null!;
         public string Address { get; set; } = null!;
         public string ZoneAccess { get; set; } = null!;
+        public string State { get; set; } = null!;
 
         public virtual EmployeeCredential? EmployeeCredential { get; }
         public virtual Specialty Specialty { get; } = null!;
