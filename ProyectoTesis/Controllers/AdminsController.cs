@@ -1,13 +1,19 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using ProyectoTesis.Models.Test;
+using System.Security.Claims;
+using ProyectoTesis.Models;
 
 namespace ProyectoTesis.Controllers
 {
     //[Authorize(Roles = "ADMINISTRADOR")]
-    public class AdminsController : Controller
+    public class AdminsController
+        (TesisContext context) :
+        Controller
     {
+        private ClaimsPrincipal? _claimsPrincipal;
+
         [HttpGet]
         public IActionResult InterfaceAdmin() => View();
 
@@ -18,49 +24,71 @@ namespace ProyectoTesis.Controllers
         public IActionResult AttendanceList() => View();
 
         [HttpGet]
-        public IActionResult LoadListEmployees()
+        public async Task<IActionResult> LoadListEmployees()
         {
-            List<Employee> employees = [];
-
-            employees.Add(new(4551, "Aaron", "Alarcon", "Administracion", "Supervisor"));
-            employees.Add(new(5644, "Alejandro", "Chacon", "Administracion", "Supervisor"));
-            employees.Add(new(3452, "Cristiano", "Meza", "Administracion", "Supervisor"));
-            employees.Add(new(8766, "Pedro", "Romero", "Administracion", "Supervisor"));
-            employees.Add(new(5678, "Juan", "Perez", "Administracion", "Supervisor"));
+            var result = await
+                (from em in context.Set<Employee>()
+                 join es in context.Set<Specialty>()
+                 on em.SpecialtiesId equals es.Id
+                 join an in context.Set<Assign>()
+                 on em.Id equals an.EmployeesId
+                 join po in context.Set<Position>()
+                 on an.PositionsId equals po.Id
+                 join ar in context.Set<Area>()
+                 on po.AreasId equals ar.Id
+                 select new
+                 {
+                     em.Id,
+                     em.DateEntry,
+                     em.TypeDocument,
+                     em.Firstname,
+                     em.Lastname,
+                     em.Birthdate,
+                     em.Nationality,
+                     em.Genre,
+                     em.Phone,
+                     em.Email,
+                     em.Address,
+                     em.ZoneAccess,
+                     Area = ar.Name,
+                     Position = po.Name,
+                     Specialty = es.Name,
+                 }
+                ).ToListAsync();
 
             return Content(JsonConvert.SerializeObject
-                (employees), "application/json");
+                (result), "application/json");
         }
 
         [HttpGet]
-        public IActionResult ListAttendances()
+        public async Task<IActionResult> LoadListAttendances()
         {
-            List<Attendance> attendances = [];
-
-            attendances.Add(new(4551, "Aaron", "Alarcon", DateTime.Now, DateTime.Now.AddHours(4), 2));
-            attendances.Add(new(4551, "Aaron", "Alarcon", DateTime.Now, DateTime.Now.AddHours(4), 2));
-            attendances.Add(new(4551, "Aaron", "Alarcon", DateTime.Now, DateTime.Now.AddHours(4), 2));
-            attendances.Add(new(4551, "Aaron", "Alarcon", DateTime.Now, DateTime.Now.AddHours(4), 2));
-            attendances.Add(new(4551, "Aaron", "Alarcon", DateTime.Now, DateTime.Now.AddHours(4), 2));
+            var assists = await context.Set<Assist>()
+                .Where(a => a.AdminsId == GetPersonId()).ToListAsync();
 
             return Content(JsonConvert.SerializeObject
-                (attendances),"application/json");
+                (assists), "application/json");
         }
 
         [HttpGet]
-        public IActionResult LoadListAttendances(int id)
+        public async Task<IActionResult> LoadListAttendancesByEmployee
+            (string employeeId)
         {
-            List<Attendance> attendances = [];
-
-            attendances.Add(new(4551, "Aaron", "Alarcon", DateTime.Now, DateTime.Now.AddHours(4), 2));
-            attendances.Add(new(5644, "Alejandro", "Chacon", DateTime.Now, DateTime.Now.AddHours(4), 2));
-            attendances.Add(new(3452, "Cristiano", "Meza", DateTime.Now, DateTime.Now.AddHours(4), 2));
-            attendances.Add(new(8766, "Pedro", "Romero", DateTime.Now, DateTime.Now.AddHours(4), 2));
-            attendances.Add(new(5678, "Juan", "Perez", DateTime.Now, DateTime.Now.AddHours(4), 2));
+            var assists = await context.Set<Assist>()
+                .Where(a => a.EmployeesId == employeeId)
+                .ToListAsync();
 
             return Content(JsonConvert.SerializeObject
-                (attendances.Where(a => a.Id == id).ToList()),
-                "application/json");
+                (assists), "application/json");
+        }
+
+        private string GetPersonId()
+        {
+            _claimsPrincipal = HttpContext.User;
+
+            return _claimsPrincipal
+                .FindFirst(ClaimTypes.Name)?
+                .Value.ToString() ?? string.Empty;
         }
     }
 }
