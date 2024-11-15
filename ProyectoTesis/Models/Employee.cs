@@ -16,7 +16,7 @@
         public string Address { get; set; } = null!;
         public string ZoneAccess { get; set; } = null!;
 
-        public virtual EmployeesCredential? EmployeeCredential { get; }
+        public virtual EmployeeCredential? EmployeeCredential { get; }
         public virtual Specialty Specialty { get; } = null!;
 
         public virtual ICollection<Assign> Assigns { get; } = [];

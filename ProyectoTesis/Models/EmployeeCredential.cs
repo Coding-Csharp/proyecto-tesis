@@ -1,6 +1,6 @@
 ﻿namespace ProyectoTesis.Models
 {
-    public class EmployeesCredential
+    public class EmployeeCredential
     {
         public string EmployeesId { get; set; } = null!;
         public string Code { get; set; } = null!;

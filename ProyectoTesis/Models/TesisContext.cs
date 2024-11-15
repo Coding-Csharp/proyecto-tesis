@@ -226,7 +226,7 @@ namespace ProyectoTesis.Models
                     .HasConstraintName("fk_employees_specialties_id");
             });
 
-            modelBuilder.Entity<EmployeesCredential>(entity =>
+            modelBuilder.Entity<EmployeeCredential>(entity =>
             {
                 entity.HasKey(e => e.EmployeesId).HasName("pk_employee_credential_employees_id");
 
@@ -243,7 +243,7 @@ namespace ProyectoTesis.Models
                     .HasColumnName("code");
 
                 entity.HasOne(d => d.Employee).WithOne(p => p.EmployeeCredential)
-                    .HasForeignKey<EmployeesCredential>(d => d.EmployeesId)
+                    .HasForeignKey<EmployeeCredential>(d => d.EmployeesId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("fk_employees_credentials_employees_id");
             });
