@@ -38,16 +38,13 @@
                         </a>
                     </li>
 
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <li class="nav-item">
+                        <a class="nav-link" href="@Url.Action("AttendanceList", "Employees")">
                             <i class="fa fa-envelope-o">
-                                @* <span class="badge badge-primary">11</span> *@
-                            </i> Trabajadores
+                                <span class="badge badge-danger">11</span>
+                            </i>
+                            Asistencias
                         </a>
-                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" href="@Url.Action("AttendanceList", "Employees")">Asistencia</a>
-                            <a class="dropdown-item" href="@Url.Action("Maintenance", "Employees")">Mantenimiento</a>
-                        </div>
                     </li>
 
                 </ul>

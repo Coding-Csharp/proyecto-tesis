@@ -48,12 +48,21 @@
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <i class="fa fa-envelope-o">
                                 @* <span class="badge badge-primary">11</span> *@
-                            </i> Administracion
+                            </i> Trabajadores
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                             <a class="dropdown-item" href="@Url.Action("ListEmployees", "Admins")">Listado de trabajadores</a>
                             <a class="dropdown-item" href="#">Reportes de asistencia</a>
                         </div>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="@Url.Action("Reports", "Admins")">
+                            <i class="fa fa-envelope-o">
+                                <span class="badge badge-danger">11</span>
+                            </i>
+                            Reporte de asistencia
+                        </a>
                     </li>
 
                 </ul>
