@@ -16,13 +16,49 @@
         <h3>Control de asistencias</h3>
     </div>
 
-    <a class="btn btn-warning" data-toggle="modal" data-target="#mdlRegisterCheckOut">Marcar asistencia</a>
+    <a id="btnCheckIn" class="btn btn-primary" data-toggle="modal" data-target="#mdlRegisterCheckIn">Marcar entrada</a>
+    <a id="btnCheckOut" class="btn btn-warning" data-toggle="modal" data-target="#mdlRegisterCheckOut">Marcar salida</a>
 
     <hr />
 
     <table id="tblAttendances" class="table table-striped table-bordered" style="width:auto;"></table>
 </div>
 
+<div id="mdlRegisterCheckIn" class="modal fade" tabindex="-1" aria-labelledby="mdlRegisterCheckIn" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header float-right">
+
+                <h5>Registrar salida</h5>
+
+                <div class="text-right">
+                    <i data-dismiss="modal" aria-label="Close" class="fa fa-close"></i>
+                </div>
+
+            </div>
+
+            <div class="modal-body">
+                <div>
+                    <div class="box">
+
+                        <label>Hora de entrada:</label>
+                        <input id="iptCheckIn" class="form-control" readonly>
+
+                        <label>Hora de salida:</label>
+                        <input id="iptCheckOut" value="---" class="form-control" readonly>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button id="btnRegisterCheckIn" type="button" class="btn btn-primary">Registrar</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 <div id="mdlRegisterCheckOut" class="modal fade" tabindex="-1" aria-labelledby="mdlRegisterCheckOut" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -42,10 +78,10 @@
                     <div class="box">
 
                         <label>Hora de entrada:</label>
-                        <input id="iptCheckIn" value="---" class="form-control" readonly>
+                        <input id="ipttCheckIn" value="---" class="form-control" readonly>
 
                         <label>Hora de salida:</label>
-                        <input id="iptCheckOut" class="form-control" readonly>
+                        <input id="ipttCheckOut" class="form-control" readonly>
 
                     </div>
                 </div>
@@ -72,8 +108,6 @@
 
                 try {
 
-                    $('#iptCheckOut').val(getDateTime());
-
                     await loadListAttendances();
 
                 } catch (error) {
@@ -82,11 +116,26 @@
                 }
             });
 
-            $('#tblAttendances').on('click', '#btnCheckOut', function () {
+            $("#btnCheckIn").on("click", function() {
 
-                var table = $('#tblAttendances').DataTable();
+                $("#iptCheckIn").val(getDateTime());
+            });
 
-                var rowData = table.row($(this).closest('tr')).data();
+            $("#btnRegisterCheckIn").on("click", async function() {
+
+                await markAttendance("ENTRADA");
+                await loadListAttendances();
+            });
+
+            $("#btnCheckOut").on("click", function() {
+
+                $("#ipttCheckOut").val(getDateTime());
+            });
+
+            $("#btnRegisterCheckOut").on("click", async function() {
+
+                await markAttendance("SALIDA");
+                await loadListAttendances();
             });
 
             async function loadListAttendances() {
@@ -95,7 +144,7 @@
 
                     var data = await jQuery.ajax({
 
-                        url: '@Url.Action("ListAttendances", "Admins")',
+                        url: '@Url.Action("LoadListAttendances", "Admins")',
                         method: 'GET',
                         dataType: 'json',
                         contentType: 'application/json; charset=utf-8'
@@ -107,7 +156,41 @@
 
                 } catch (error) {
 
-                    window.open('@Url.Action("Error", "Home")', '_self');
+                    //window.open('@Url.Action("Error", "Home")', '_self');
+                }
+            }
+
+            async function markAttendance(markType) {
+
+                try {
+
+                    var data = await jQuery.ajax({
+
+                        url: '@Url.Action("MarkAttendance", "Admins")' + `?markType=${markType}`,
+                        method: 'GET',
+                        dataType: 'json',
+                        contentType: 'application/json; charset=utf-8'
+                    });
+
+                    if (data === true) {
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Se marco su asistencia!',
+                            text: `Se registro correctamente su hora de ${markType}.`
+                        });
+                    } else {
+
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'No se marco la asistencia!',
+                            text: `No se pudo registrar su hora de ${markType}.`
+                        });
+                    }
+
+                } catch (error) {
+
+                    //window.open('@Url.Action("Error", "Home")', '_self');
                 }
             }
 
@@ -128,8 +211,8 @@
 
                 columns = [
                     { data: 'Id', title: 'Id' },
-                    { data: 'FirstName', title: 'Nombre' },
-                    { data: 'LastName', title: 'Apellido' },
+                    { data: 'Firstname', title: 'Nombre' },
+                    { data: 'Lastname', title: 'Apellido' },
                     { data: 'CheckIn', title: 'Ingreso' },
                     { data: 'CheckOut', title: 'Salida' },
                     { data: 'MinuteLate', title: 'Min tarde' }

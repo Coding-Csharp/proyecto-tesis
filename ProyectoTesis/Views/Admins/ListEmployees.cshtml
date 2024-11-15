@@ -90,7 +90,7 @@
 
                 jQuery.ajax({
 
-                    url: '@Url.Action("LoadListAttendances", "Admins")' + `?id=${rowData.Id}`,
+                    url: '@Url.Action("LoadListAttendancesByEmployee", "Admins")' + `?employeeId=${rowData.Id}`,
                     method: 'GET',
                     dataType: 'json',
                     contentType: 'application/json; charset=utf-8',
@@ -159,10 +159,10 @@
 
                 columns = [
                     { data: 'Id', title: 'Id' },
-                    { data: 'FirstName', title: 'Nombre' },
-                    { data: 'LastName', title: 'Apellido' },
-                    { data: 'JobDepartment', title: 'Departamento' },
-                    { data: 'JobPosition', title: 'Cargo' }
+                    { data: 'Firstname', title: 'Nombre' },
+                    { data: 'Lastname', title: 'Apellido' },
+                    { data: 'Area', title: 'Area' },
+                    { data: 'Position', title: 'Cargo' }
                 ];
 
                 columns.push({
