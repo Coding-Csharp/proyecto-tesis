@@ -33,37 +33,45 @@ namespace ProyectoTesis.Controllers
             return View();
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync
+                (CookieAuthenticationDefaults
+                .AuthenticationScheme);
+
+            return RedirectToAction("Login", "Access");
+        }
+
         [HttpPost]
         public async Task<IActionResult> Login
-            (dynamic credential)
+            (User credential)
         {
-            string role = credential.Role;
-            string id = credential.Id;
-            string code = credential.Code;
-
-            dynamic? result = role switch
+            if (credential.Role == "ADMINISTRADOR")
             {
-                "ADMINISTRADOR" =>
-                await context.Set<AdminCredential>()
-                .Where(a => a.AdminsId == id && a.Code == code)
-                .FirstOrDefaultAsync(),
+                var result = await context.Set<AdminCredential>()
+                    .Where(a => a.AdminsId == credential.Username && a.Code == credential.Password)
+                    .FirstOrDefaultAsync();
 
-                "TRABAJADOR" =>
-                await context.Set<EmployeeCredential>()
-                .Where(a => a.EmployeesId == id && a.Code == code)
-                .FirstOrDefaultAsync(),
+                if (result == null)
+                    return Content(JsonConvert.SerializeObject
+                        (false), "application/json");
+            }
+            else if (credential.Role == "TRABAJADOR")
+            {
+                var result = await context.Set<EmployeeCredential>()
+                    .Where(a => a.EmployeesId == credential.Username && a.Code == credential.Password)
+                    .FirstOrDefaultAsync();
 
-                _ => null
-            };
-
-            if (result is null)
-                return Content(JsonConvert.SerializeObject
-                    (false), "application/json");
+                if (result == null)
+                    return Content(JsonConvert.SerializeObject
+                        (false), "application/json");
+            }
 
             List<Claim> claims =
             [
-                new(ClaimTypes.Role, role),
-                new(ClaimTypes.Name, id)
+                new(ClaimTypes.Role, credential.Role ?? string.Empty),
+                new(ClaimTypes.Name, credential.Username ?? string.Empty)
             ];
 
             ClaimsIdentity claimsIdentity = new(claims,
