@@ -55,55 +55,6 @@ namespace ProyectoTesis.Controllers
         public IActionResult AttendanceList() => View();
 
         [HttpGet]
-        public IActionResult Maintenance() => View();
-
-        [HttpGet]
-        public async Task<IActionResult> LoadSpecialties()
-        {
-            var result = await context.Set<Specialty>().ToListAsync();
-
-            return Content(JsonConvert.SerializeObject
-                (result), "application/json");
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> LoadListEmployees()
-        {
-            var result = await
-                (from em in context.Set<Employee>()
-                 join es in context.Set<Specialty>()
-                 on em.SpecialtiesId equals es.Id
-                 join an in context.Set<Assign>()
-                 on em.Id equals an.EmployeesId
-                 join po in context.Set<Position>()
-                 on an.PositionsId equals po.Id
-                 join ar in context.Set<Area>()
-                 on po.AreasId equals ar.Id
-                 select new
-                 {
-                     em.Id,
-                     em.DateEntry,
-                     em.TypeDocument,
-                     em.Firstname,
-                     em.Lastname,
-                     em.Birthdate,
-                     em.Nationality,
-                     em.Genre,
-                     em.Phone,
-                     em.Email,
-                     em.Address,
-                     em.ZoneAccess,
-                     Area = ar.Name,
-                     Position = po.Name,
-                     Specialty = es.Name,
-                 }
-                ).ToListAsync();
-
-            return Content(JsonConvert.SerializeObject
-                (result), "application/json");
-        }
-
-        [HttpGet]
         public async Task<IActionResult> LoadListAttendances()
         {
             var currentDate = DateTime.Now;
@@ -121,51 +72,15 @@ namespace ProyectoTesis.Controllers
                      at.Id,
                      em.Firstname,
                      em.Lastname,
+                     at.CheckIn.Value.Date,
                      at.CheckIn,
                      at.CheckOut,
                      at.MinuteLate
                  }
                 ).ToListAsync();
 
-            return Content(JsonConvert.SerializeObject(result), "application/json");
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> RegisterEmployee
-            (Employee employee)
-        {
-            await context.Set<Employee>().AddAsync(employee);
-
-            await context.SaveChangesAsync();
-
             return Content(JsonConvert.SerializeObject
-                (true), "application/json");
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> UpdateEmployee
-            (Employee employee)
-        {
-            context.Set<Employee>().Update(employee);
-
-            await context.SaveChangesAsync();
-
-            return Content(JsonConvert.SerializeObject
-                (true), "application/json");
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> DeleteEmployee
-            (string id)
-        {
-            var employee = await context.Set<Employee>().Where(e => e.Id == id).FirstOrDefaultAsync();
-
-            context.Set<Employee>().Remove(employee);
-
-            await context.SaveChangesAsync();
-
-            return Content(JsonConvert.SerializeObject
-                (true), "application/json");
+                (result), "application/json");
         }
 
         [HttpGet]
@@ -176,14 +91,23 @@ namespace ProyectoTesis.Controllers
 
             if (markType == "ENTRADA")
             {
-                var s = GetPersonId();
+                var today = DateTime.Now.Date;
 
-                await context.Set<Assist>().AddAsync
+                var assist = await context.Set<Assist>()
+                    .Where(a => a.EmployeesId == GetPersonId() &&
+                                a.CheckIn.HasValue &&
+                                a.CheckIn.Value.Date == today)
+                    .FirstOrDefaultAsync();
+
+                if (assist == null)
+                {
+                    await context.Set<Assist>().AddAsync
                     (new(null, GetPersonId(), DateTime.Now, null, 0, string.Empty));
 
-                await context.SaveChangesAsync();
+                    await context.SaveChangesAsync();
 
-                result = true;
+                    result = true;
+                }
             }
             else if (markType == "SALIDA")
             {
