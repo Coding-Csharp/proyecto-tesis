@@ -38,7 +38,7 @@
                     <li class="nav-item">
                         <a class="nav-link" href="@Url.Action("AttendanceList", "Admins")">
                             <i class="fa fa-envelope-o">
-                                <span class="badge badge-danger">11</span>
+                                @* <span class="badge badge-danger">11</span> *@
                             </i>
                             Asistencias
                         </a>
@@ -52,14 +52,14 @@
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                             <a class="dropdown-item" href="@Url.Action("ListEmployees", "Admins")">Listado de trabajadores</a>
-                            <a class="dropdown-item" href="#">Reportes de asistencia</a>
+                            <a class="dropdown-item" href="@Url.Action("Maintenance", "Admins")">Mantenimiento de trabajadores</a>
                         </div>
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link" href="@Url.Action("Reports", "Admins")">
+                        <a class="nav-link" href="@Url.Action("ReportsAttendances", "Admins")">
                             <i class="fa fa-envelope-o">
-                                <span class="badge badge-danger">11</span>
+                                @* <span class="badge badge-danger">11</span> *@
                             </i>
                             Reporte de asistencia
                         </a>
