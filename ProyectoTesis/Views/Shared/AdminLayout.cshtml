@@ -29,7 +29,7 @@
                 <ul class="navbar-nav mr-auto">
                     <li class="nav-item active">
                         <a class="nav-link" href="@Url.Action("InterfaceAdmin", "Admins")">
-                            <i class="fa fa-home"></i> Inicio
+                            <i class="fa fa-home"></i> Datos personales
                             <span class="sr-only">(current)</span>
                         </a>
                     </li>
@@ -41,25 +41,15 @@
                             Asistencias
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="@Url.Action("ListEmployees", "Admins")">
-                            <i class="fa fa-envelope-o">
-                                <span class="badge badge-danger">11</span>
-                            </i>
-                            Empleados
-                        </a>
-                    </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <i class="fa fa-envelope-o">
-                                <span class="badge badge-primary">11</span>
-                            </i> Dropdown
+                                @* <span class="badge badge-primary">11</span> *@
+                            </i> Operaciones
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" href="#">Action</a>
-                            <a class="dropdown-item" href="#">Another action</a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="#">Something else here</a>
+                            <a class="dropdown-item" href="@Url.Action("ListEmployees", "Admins")">Listado de trabajadores</a>
+                            <a class="dropdown-item" href="#">Reportes de asistencia</a>
                         </div>
                     </li>
                 </ul>
@@ -69,7 +59,7 @@
                     <li class="nav-item">
                         <a class="nav-link" href="#">
                             <i class="fa fa-bell">
-                                <span class="badge badge-info">11</span>
+                                @* <span class="badge badge-info">11</span> *@
                             </i>
                             Notificaciones
                         </a>
