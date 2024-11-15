@@ -7,7 +7,7 @@ using ProyectoTesis.Models;
 
 namespace ProyectoTesis.Controllers
 {
-    //[Authorize(Roles = "ADMINISTRADOR")]
+    [Authorize(Roles = "ADMINISTRADOR")]
     public class AdminsController
         (TesisContext context) :
         Controller
@@ -15,7 +15,40 @@ namespace ProyectoTesis.Controllers
         private ClaimsPrincipal? _claimsPrincipal;
 
         [HttpGet]
-        public IActionResult InterfaceAdmin() => View();
+        public async Task<IActionResult> InterfaceAdmin()
+        {
+            ViewBag.Admin = await
+                (from ad in context.Set<Admin>()
+                 join es in context.Set<Specialty>()
+                 on ad.SpecialtiesId equals es.Id
+                 join an in context.Set<Assign>()
+                 on ad.Id equals an.AdminsId
+                 join po in context.Set<Position>()
+                 on an.PositionsId equals po.Id
+                 join ar in context.Set<Area>()
+                 on po.AreasId equals ar.Id
+                 where ad.Id == GetPersonId()
+                 select new
+                 {
+                     ad.Id,
+                     ad.DateEntry,
+                     ad.TypeDocument,
+                     ad.Firstname,
+                     ad.Lastname,
+                     ad.Birthdate,
+                     ad.Nationality,
+                     ad.Genre,
+                     ad.Phone,
+                     ad.Email,
+                     ad.Address,
+                     Area = ar.Name,
+                     Position = po.Name,
+                     Specialty = es.Name,
+                 }
+                ).FirstOrDefaultAsync();
+
+            return View();
+        }
 
         [HttpGet]
         public IActionResult ListEmployees() => View();
@@ -63,11 +96,24 @@ namespace ProyectoTesis.Controllers
         [HttpGet]
         public async Task<IActionResult> LoadListAttendances()
         {
-            var assists = await context.Set<Assist>()
-                .Where(a => a.AdminsId == GetPersonId()).ToListAsync();
+            var result = await
+                (from at in context.Set<Assist>()
+                 join ad in context.Set<Admin>()
+                 on at.AdminsId equals ad.Id
+                 where ad.Id == GetPersonId()
+                 select new
+                 {
+                     at.Id,
+                     ad.Firstname,
+                     ad.Lastname,
+                     at.CheckIn,
+                     at.CheckOut,
+                     at.MinuteLate
+                 }
+                ).ToListAsync();
 
             return Content(JsonConvert.SerializeObject
-                (assists), "application/json");
+                (result), "application/json");
         }
 
         [HttpGet]
@@ -80,6 +126,41 @@ namespace ProyectoTesis.Controllers
 
             return Content(JsonConvert.SerializeObject
                 (assists), "application/json");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> MarkAttendance
+            (string markType)
+        {
+            var result = false;
+
+            if (markType == "ENTRADA")
+            {
+                var s = GetPersonId();
+
+                await context.Set<Assist>().AddAsync
+                    (new(GetPersonId(), null, DateTime.Now, null, 0, string.Empty));
+
+                await context.SaveChangesAsync();
+
+                result = true;
+            }
+            else if (markType == "SALIDA")
+            {
+                var assist = await context.Set<Assist>()
+                    .Where(a => a.AdminsId == GetPersonId() &&
+                    a.CheckOut == null).FirstOrDefaultAsync();
+
+                if (assist != null)
+                {
+                    result = await context.Set<Assist>().Where(a => a.Id == assist.Id)
+                    .ExecuteUpdateAsync(a => a
+                    .SetProperty(u => u.CheckOut, DateTime.Now)) > 0;
+                }
+            }
+
+            return Content(JsonConvert.SerializeObject
+                (result), "application/json");
         }
 
         private string GetPersonId()
