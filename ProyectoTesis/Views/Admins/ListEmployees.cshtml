@@ -44,6 +44,7 @@
                             <table class="table table-bordered">
                                 <thead>
                                     <tr>
+                                        <th scope="col">Fecha</th>
                                         <th scope="col">Entrada</th>
                                         <th scope="col">Salida</th>
                                         <th scope="col">Min Tardanza</th>
@@ -90,7 +91,7 @@
 
                 jQuery.ajax({
 
-                    url: '@Url.Action("LoadListAttendancesByEmployee", "Admins")' + `?employeeId=${rowData.Id}`,
+                    url: '@Url.Action("LoadListAttendancesByPersonId", "Admins")' + `?personId=${rowData.Id}`,
                     method: 'GET',
                     dataType: 'json',
                     contentType: 'application/json; charset=utf-8',
@@ -100,13 +101,15 @@
 
                         for (const item of data) {
 
+                            var date = new Date(item.Date);
                             var checkIn = new Date(item.CheckIn);
                             var checkOut = new Date(item.CheckOut);
 
                             contentHtml +=
                                 `<tr>
-                                    <th scope="col">${getFormattedDate(checkIn)}</th>
-                                    <th scope="col">${getFormattedDate(checkOut)}</th>
+                                    <th scope="col">${getFormattedDate(date)}</th>
+                                    <th scope="col">${getFormattedTime(checkIn)}</th>
+                                    <th scope="col">${getFormattedTime(checkOut)}</th>
                                     <th scope="col">${item.MinuteLate}</th>
                                  </tr>`;
                         }
@@ -115,7 +118,7 @@
                     },
                     error: function(error) {
 
-                        window.open('@Url.Action("Error", "Home")', '_self');
+                        //window.open('@Url.Action("Error", "Home")', '_self');
                     }
                 });
             });
@@ -190,6 +193,40 @@
                 });
             }
 
+            function getDateTime() {
+
+                const date = new Date();
+
+                const day = date.getDate();
+                const mounth = date.getMonth() + 1;
+                const year = date.getFullYear();
+                const hour = date.getHours();
+                const minutes = date.getMinutes();
+
+                return `${day}/${mounth}/${year} ${hour}:${minutes}`;
+            }
+
+            function getDate() {
+
+                const date = new Date();
+
+                const day = date.getDate();
+                const mounth = date.getMonth() + 1;
+                const year = date.getFullYear();
+
+                return `${day}/${mounth}/${year}`;
+            }
+
+            function getTime() {
+
+                const date = new Date();
+
+                const hour = date.getHours();
+                const minutes = date.getMinutes();
+
+                return `${hour}:${minutes}`;
+            }
+
             function getFormattedDate(date) {
 
                 let day = String(date.getDate()).padStart(2, '0');
@@ -197,9 +234,19 @@
                 let year = date.getFullYear();
                 let hour = String(date.getHours()).padStart(2, '0');
                 let minutes = String(date.getMinutes()).padStart(2, '0');
-                let seconds = String(date.getSeconds()).padStart(2, '0');
 
-                return `${day}/${mounth}/${year} ${hour}:${minutes}:${seconds}`;
+                return `${day}/${mounth}/${year}`;
+            }
+
+            function getFormattedTime(date) {
+
+                let day = String(date.getDate()).padStart(2, '0');
+                let mounth = String(date.getMonth() + 1).padStart(2, '0');
+                let year = date.getFullYear();
+                let hour = String(date.getHours()).padStart(2, '0');
+                let minutes = String(date.getMinutes()).padStart(2, '0');
+
+                return `${hour}:${minutes}`;
             }
         });
 

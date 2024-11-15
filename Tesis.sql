@@ -46,7 +46,8 @@ CREATE TABLE employees
 	phone int NOT NULL,
 	email varchar(100) NOT NULL,
 	address varchar(100) NOT NULL,
-	zone_access varchar(500) NOT NULL
+	zone_access varchar(500) NOT NULL,
+	state varchar(20) NOT NULL
 
 	CONSTRAINT pk_employee_id PRIMARY KEY (id),
 
@@ -79,6 +80,7 @@ CREATE TABLE admins
 	phone int NOT NULL,
 	email varchar(100) NOT NULL,
 	address varchar(100) NOT NULL,
+	state varchar(20) NOT NULL
 
 	CONSTRAINT pk_admin_id PRIMARY KEY (id),
 
@@ -154,20 +156,20 @@ INSERT INTO positions (areas_id, name) VALUES (3, 'Técnico de laboratorio');
 INSERT INTO positions (areas_id, name) VALUES (4, 'Recepcionista');
 INSERT INTO positions (areas_id, name) VALUES (5, 'Técnico en rayos X');
 
-INSERT INTO employees (id, specialties_id, date_entry, type_document, firstname, lastname, birthdate, nationality, genre, phone, email, address, zone_access) 
-VALUES ('45515113', 1, '2022-01-15', 'DNI', 'Juan', 'Pérez', '1985-06-24', 'Peru', 'Masculino', 901256232, 'juan.perez@example.com', 'Calle Falsa 123', 'Zona A');
+INSERT INTO employees (id, specialties_id, date_entry, type_document, firstname, lastname, birthdate, nationality, genre, phone, email, address, zone_access, state) 
+VALUES ('45515113', 1, '2022-01-15', 'DNI', 'Juan', 'Pérez', '1985-06-24', 'Peru', 'Masculino', 901256232, 'juan.perez@example.com', 'Calle Falsa 123', 'Zona A', 'ACTIVO');
 
-INSERT INTO employees (id, specialties_id, date_entry, type_document, firstname, lastname, birthdate, nationality, genre, phone, email, address, zone_access) 
-VALUES ('65515453', 2, '2021-05-10', 'DNI', 'María', 'Gómez', '1990-12-12', 'Peru', 'Femenino', 941453532, 'maria.gomez@example.com', 'Avenida Real 456', 'Zona B');
+INSERT INTO employees (id, specialties_id, date_entry, type_document, firstname, lastname, birthdate, nationality, genre, phone, email, address, zone_access, state) 
+VALUES ('65515453', 2, '2021-05-10', 'DNI', 'María', 'Gómez', '1990-12-12', 'Peru', 'Femenino', 941453532, 'maria.gomez@example.com', 'Avenida Real 456', 'Zona B', 'ACTIVO');
 
-INSERT INTO employees (id, specialties_id, date_entry, type_document, firstname, lastname, birthdate, nationality, genre, phone, email, address, zone_access) 
-VALUES ('16389451', 3, '2020-03-20', 'DNI', 'Carlos', 'López', '1978-03-05', 'Peru', 'Masculino', 941256342, 'carlos.lopez@example.com', 'Paseo Central 789', 'Zona C');
+INSERT INTO employees (id, specialties_id, date_entry, type_document, firstname, lastname, birthdate, nationality, genre, phone, email, address, zone_access, state) 
+VALUES ('16389451', 3, '2020-03-20', 'DNI', 'Carlos', 'López', '1978-03-05', 'Peru', 'Masculino', 941256342, 'carlos.lopez@example.com', 'Paseo Central 789', 'Zona C', 'ACTIVO');
 
-INSERT INTO employees (id, specialties_id, date_entry, type_document, firstname, lastname, birthdate, nationality, genre, phone, email, address, zone_access) 
-VALUES ('39451515', 4, '2019-08-25', 'DNI', 'Ana', 'Martínez', '1982-11-19', 'Peru', 'Femenino', 941366532, 'ana.martinez@example.com', 'Boulevard Norte 101', 'Zona D');
+INSERT INTO employees (id, specialties_id, date_entry, type_document, firstname, lastname, birthdate, nationality, genre, phone, email, address, zone_access, state) 
+VALUES ('39451515', 4, '2019-08-25', 'DNI', 'Ana', 'Martínez', '1982-11-19', 'Peru', 'Femenino', 941366532, 'ana.martinez@example.com', 'Boulevard Norte 101', 'Zona D', 'ACTIVO');
 
-INSERT INTO employees (id, specialties_id, date_entry, type_document, firstname, lastname, birthdate, nationality, genre, phone, email, address, zone_access) 
-VALUES ('10548122', 5, '2023-04-30', 'DNI', 'Laura', 'Fernández', '1995-07-23', 'Peru', 'Femenino', 931246532, 'laura.fernandez@example.com', 'Camino Sur 202', 'Zona E');
+INSERT INTO employees (id, specialties_id, date_entry, type_document, firstname, lastname, birthdate, nationality, genre, phone, email, address, zone_access, state) 
+VALUES ('10548122', 5, '2023-04-30', 'DNI', 'Laura', 'Fernández', '1995-07-23', 'Peru', 'Femenino', 931246532, 'laura.fernandez@example.com', 'Camino Sur 202', 'Zona E', 'ACTIVO');
 
 INSERT INTO employees_credentials (employees_id, code) VALUES ('45515113', 'dev');
 INSERT INTO employees_credentials (employees_id, code) VALUES ('65515453', 'dev');
@@ -175,20 +177,20 @@ INSERT INTO employees_credentials (employees_id, code) VALUES ('16389451', 'dev'
 INSERT INTO employees_credentials (employees_id, code) VALUES ('39451515', 'dev');
 INSERT INTO employees_credentials (employees_id, code) VALUES ('10548122', 'dev');
 
-INSERT INTO admins (id, specialties_id, date_entry, type_document, firstname, lastname, birthdate, nationality, genre, phone, email, address) 
-VALUES ('32112512', 1, '2022-02-10', 'DNI', 'Luis', 'Ramírez', '1987-01-15', 'Perú', 'Masculino', 900000001, 'luis.ramirez@example.com', 'Av. Los Olivos 123');
+INSERT INTO admins (id, specialties_id, date_entry, type_document, firstname, lastname, birthdate, nationality, genre, phone, email, address, state) 
+VALUES ('32112512', 1, '2022-02-10', 'DNI', 'Luis', 'Ramírez', '1987-01-15', 'Perú', 'Masculino', 900000001, 'luis.ramirez@example.com', 'Av. Los Olivos 123', 'ACTIVO');
 
-INSERT INTO admins (id, specialties_id, date_entry, type_document, firstname, lastname, birthdate, nationality, genre, phone, email, address) 
-VALUES ('36451511', 2, '2021-06-15', 'DNI', 'Carmen', 'Soto', '1985-05-23', 'Perú', 'Femenino', 900000002, 'carmen.soto@example.com', 'Calle Lima 456');
+INSERT INTO admins (id, specialties_id, date_entry, type_document, firstname, lastname, birthdate, nationality, genre, phone, email, address, state) 
+VALUES ('36451511', 2, '2021-06-15', 'DNI', 'Carmen', 'Soto', '1985-05-23', 'Perú', 'Femenino', 900000002, 'carmen.soto@example.com', 'Calle Lima 456', 'ACTIVO');
 
-INSERT INTO admins (id, specialties_id, date_entry, type_document, firstname, lastname, birthdate, nationality, genre, phone, email, address) 
-VALUES ('02451544', 3, '2020-09-01', 'DNI', 'José', 'Mendoza', '1990-09-10', 'Perú', 'Masculino', 900000003, 'jose.mendoza@example.com', 'Paseo de la Republica 789');
+INSERT INTO admins (id, specialties_id, date_entry, type_document, firstname, lastname, birthdate, nationality, genre, phone, email, address, state) 
+VALUES ('02451544', 3, '2020-09-01', 'DNI', 'José', 'Mendoza', '1990-09-10', 'Perú', 'Masculino', 900000003, 'jose.mendoza@example.com', 'Paseo de la Republica 789', 'ACTIVO');
 
-INSERT INTO admins (id, specialties_id, date_entry, type_document, firstname, lastname, birthdate, nationality, genre, phone, email, address) 
-VALUES ('39450051', 4, '2019-11-25', 'DNI', 'Lucía', 'García', '1989-03-12', 'Perú', 'Femenino', 900000004, 'lucia.garcia@example.com', 'Jr. Primavera 101');
+INSERT INTO admins (id, specialties_id, date_entry, type_document, firstname, lastname, birthdate, nationality, genre, phone, email, address, state) 
+VALUES ('39450051', 4, '2019-11-25', 'DNI', 'Lucía', 'García', '1989-03-12', 'Perú', 'Femenino', 900000004, 'lucia.garcia@example.com', 'Jr. Primavera 101', 'ACTIVO');
 
-INSERT INTO admins (id, specialties_id, date_entry, type_document, firstname, lastname, birthdate, nationality, genre, phone, email, address) 
-VALUES ('05481214', 5, '2023-04-14', 'DNI', 'Ricardo', 'Torres', '1992-07-20', 'Perú', 'Masculino', 900000005, 'ricardo.torres@example.com', 'Av. Independencia 202');
+INSERT INTO admins (id, specialties_id, date_entry, type_document, firstname, lastname, birthdate, nationality, genre, phone, email, address, state) 
+VALUES ('05481214', 5, '2023-04-14', 'DNI', 'Ricardo', 'Torres', '1992-07-20', 'Perú', 'Masculino', 900000005, 'ricardo.torres@example.com', 'Av. Independencia 202', 'ACTIVO');
 
 INSERT INTO admins_credentials (admins_id, code) VALUES ('32112512', 'dev');
 INSERT INTO admins_credentials (admins_id, code) VALUES ('36451511', 'dev');
