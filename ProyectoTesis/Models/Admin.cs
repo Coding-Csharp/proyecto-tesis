@@ -14,7 +14,6 @@
         public int Phone { get; set; }
         public string Email { get; set; } = null!;
         public string Address { get; set; } = null!;
-        public string ZoneAccess { get; set; } = null!;
 
         public virtual AdminCredential? AdminCredential { get; }
         public virtual Specialty Specialty { get; } = null!;

@@ -55,10 +55,6 @@ namespace ProyectoTesis.Models
                     .HasMaxLength(20)
                     .IsUnicode(false)
                     .HasColumnName("type_document");
-                entity.Property(e => e.ZoneAccess)
-                    .HasMaxLength(500)
-                    .IsUnicode(false)
-                    .HasColumnName("zone_access");
 
                 entity.HasOne(d => d.Specialty).WithMany(p => p.Admins)
                     .HasForeignKey(d => d.SpecialtiesId)
