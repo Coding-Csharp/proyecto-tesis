@@ -30,8 +30,8 @@
 
             <select id="sltRoles">
                 <option selected>Seleccione su roll</option>
-                <option>TECNICO</option>
-                <option>CONSUMIDOR</option>
+                <option>ADMINISTRADOR</option>
+                <option>TRABAJADOR</option>
             </select>
 
             <hr />
@@ -179,7 +179,7 @@
                     },
                     error: function () {
 
-                        window.open('@Url.Action("Error", "Home")', "_self");
+                        //window.open('@Url.Action("Error", "Home")', "_self");
                     }
                 });
             }
@@ -223,7 +223,7 @@
                     },
                     error: function () {
 
-                        window.open('@Url.Action("Error", "Home")', "_self");
+                        //window.open('@Url.Action("Error", "Home")', "_self");
                     }
                 });
             }
