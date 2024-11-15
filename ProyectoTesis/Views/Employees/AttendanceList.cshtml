@@ -16,7 +16,7 @@
         <h3>Control de asistencias</h3>
     </div>
 
-    <a id="btnCheckIn" class="btn btn-warning" data-toggle="modal" data-target="#mdlRegisterCheckIn">Marcar entrada</a>
+    <a id="btnCheckIn" class="btn btn-primary" data-toggle="modal" data-target="#mdlRegisterCheckIn">Marcar entrada</a>
     <a id="btnCheckOut" class="btn btn-warning" data-toggle="modal" data-target="#mdlRegisterCheckOut">Marcar salida</a>
 
     <hr />
@@ -53,7 +53,7 @@
             </div>
 
             <div class="modal-footer">
-                <button id="btnRegisterCheckOut" type="button" class="btn btn-primary">Registrar</button>
+                <button id="btnRegisterCheckIn" type="button" class="btn btn-primary">Registrar</button>
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
             </div>
         </div>
@@ -78,7 +78,7 @@
                     <div class="box">
 
                         <label>Hora de entrada:</label>
-                        <input id="ipttCheckIn" class="form-control" readonly>
+                        <input id="ipttCheckIn" value="---" class="form-control" readonly>
 
                         <label>Hora de salida:</label>
                         <input id="ipttCheckOut" class="form-control" readonly>
@@ -121,10 +121,21 @@
                 $("#iptCheckIn").val(getDateTime());
             });
 
+            $("#btnRegisterCheckIn").on("click", async function() {
+
+                await markAttendance("ENTRADA");
+                await loadListAttendances();
+            });
+
             $("#btnCheckOut").on("click", function() {
 
-                $("#ipttCheckIn").val();
-                $("#ipttCheckOut").val();
+                $("#ipttCheckOut").val(getDateTime());
+            });
+
+            $("#btnRegisterCheckOut").on("click", async function() {
+
+                await markAttendance("SALIDA");
+                await loadListAttendances();
             });
 
             async function loadListAttendances() {
@@ -149,6 +160,40 @@
                 }
             }
 
+            async function markAttendance(markType) {
+
+                try {
+
+                    var data = await jQuery.ajax({
+
+                        url: '@Url.Action("MarkAttendance", "Employees")' + `?markType=${markType}`,
+                        method: 'GET',
+                        dataType: 'json',
+                        contentType: 'application/json; charset=utf-8'
+                    });
+
+                    if (data === true) {
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Se marco su asistencia!',
+                            text: `Se registro correctamente su hora de ${markType}.`
+                        });
+                    } else {
+
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'No se marco la asistencia!',
+                            text: `No se pudo registrar su hora de ${markType}.`
+                        });
+                    }
+
+                } catch (error) {
+
+                    window.open('@Url.Action("Error", "Home")', '_self');
+                }
+            }
+
             function fillTableAttendances(listAttendances) {
 
                 if (listAttendances.length === 0) {
@@ -166,8 +211,8 @@
 
                 columns = [
                     { data: 'Id', title: 'Id' },
-                    { data: 'FirstName', title: 'Nombre' },
-                    { data: 'LastName', title: 'Apellido' },
+                    { data: 'Firstname', title: 'Nombre' },
+                    { data: 'Lastname', title: 'Apellido' },
                     { data: 'CheckIn', title: 'Ingreso' },
                     { data: 'CheckOut', title: 'Salida' },
                     { data: 'MinuteLate', title: 'Min tarde' }
