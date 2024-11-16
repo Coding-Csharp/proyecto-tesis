@@ -74,24 +74,19 @@
             });
 
             $('#btnSearch').on('click', function() {
-                // Obtener las fechas seleccionadas y asegurarse de que sean válidas
-                var startDateVal = new Date($('#iptStartDate').val());
-                var endDateVal = new Date($('#iptEndDate').val());
 
-                // Formatear las fechas en el formato dd/mm/yyyy
-                var startDateFormatted = startDateVal ? getFormattedDate(startDateVal) : null;
-                var endDateFormatted = endDateVal ? getFormattedDate(endDateVal) : null;
+                var name = $('#iptSearchName').val();
+                var startDate = new Date($('#iptStartDate').val());
+                var endDate = new Date($('#iptEndDate').val());
 
                 var filteredAttendances = attendances.filter(a => {
-                    var start = a.CheckIn;
-                    var end = a.CheckIn;
-                    var nameMatch = a.Firstname.toLowerCase().includes($('#iptSearchName').val().toLowerCase());
 
-                    return (
-                        (startDateFormatted ? start === startDateFormatted : true) &&
-                        (endDateFormatted ? end === endDateFormatted : true) &&
-                        (nameMatch || !$('#iptSearchName').val())
-                    );
+                    var attendanceDateParts = a.Date.split('/');
+                    var attendanceDate = new Date(attendanceDateParts[2], attendanceDateParts[1] - 1, attendanceDateParts[0]);
+
+                    var isInDateRange = attendanceDate >= startDate && attendanceDate <= endDate;
+
+                    return a.Firstname === name && isInDateRange;
                 });
 
                 fillTableAttendances(filteredAttendances);
@@ -209,6 +204,15 @@
                 const minutes = date.getMinutes();
 
                 return `${hour}:${minutes}`;
+            }
+
+            function getFormattedDateV2(date) {
+
+                const day = date.getDate();
+                const mounth = date.getMonth() + 1;
+                const year = date.getFullYear();
+
+                return `${day}/${mounth}/${year}`;
             }
 
             function getFormattedDate(date) {
