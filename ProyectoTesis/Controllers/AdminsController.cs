@@ -60,6 +60,9 @@ namespace ProyectoTesis.Controllers
         public IActionResult AttendanceList() => View();
 
         [HttpGet]
+        public IActionResult ReportAttendance() => View();
+
+        [HttpGet]
         public async Task<IActionResult> LoadSpecialties()
         {
             var result = await context.Set<Specialty>().ToListAsync();
@@ -155,21 +158,49 @@ namespace ProyectoTesis.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> LoadListAttendancesByPersonId
-            (string personId)
+        public async Task<IActionResult> LoadAllListAttendances()
         {
-           var result = await
+            var currentDate = DateTime.Now;
+
+            var result = await
                 (from at in context.Set<Assist>()
-                 where at.EmployeesId == personId ||
-                 at.AdminsId == personId
+                 join ad in context.Set<Admin>()
+                 on at.AdminsId equals ad.Id
+                 where  at.CheckIn.HasValue
+                 && at.CheckIn.Value.Month == currentDate.Month
+                 && at.CheckIn.Value.Year == currentDate.Year
                  select new
                  {
                      at.Id,
+                     ad.Firstname,
+                     ad.Lastname,
                      at.CheckIn.Value.Date,
                      at.CheckIn,
                      at.CheckOut,
                      at.MinuteLate
-                 }).ToListAsync();
+                 }
+                ).ToListAsync();
+
+            return Content(JsonConvert.SerializeObject
+                (result), "application/json");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> LoadListAttendancesByPersonId
+            (string personId)
+        {
+            var result = await
+                 (from at in context.Set<Assist>()
+                  where at.EmployeesId == personId ||
+                  at.AdminsId == personId
+                  select new
+                  {
+                      at.Id,
+                      at.CheckIn.Value.Date,
+                      at.CheckIn,
+                      at.CheckOut,
+                      at.MinuteLate
+                  }).ToListAsync();
 
             return Content(JsonConvert.SerializeObject
                 (result), "application/json");
